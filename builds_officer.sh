@@ -114,4 +114,6 @@ for ((i = 0; i < ${#flavors[@]}; i += 2)); do
     done
 done
 
+open builds/$current_date_time
+
 echo "🎉 All builds completed successfully!, you can find all the builds in /builds folder"
