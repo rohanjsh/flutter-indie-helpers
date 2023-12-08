@@ -1,22 +1,63 @@
 #!/bin/bash
 
+#! DEFAULTS
+#! change these to your own
+default_num_flavors=2
+default_flavors=("dev" "lib/main_dev.dart" "prod" "lib/main_prod.dart")
+
+# Automates Flutter project builds with flavor and type options.
+
+# Prerequisites:
+# - Flutter installed and configured.
+# - Bash shell environment.
+
+# Usage:
+# - Default: ./build_script.sh
+# - Custom: ./build_script.sh --use-defaults
+# - No Flavor: ./build_script.sh --no-flavor
+
+# Options:
+# --use-defaults: Use default values.
+# --no-flavor: Build without flavors.
+
+# Examples:
+# - Default: ./build_script.sh
+# - Custom: ./build_script.sh --use-defaults
+# - No Flavor: ./build_script.sh --no-flavor
+
+# How To Guide:
+# - Run the script and follow prompts for custom builds.
+#   - Number of flavors
+#   - Flavor name and entry point for each flavor
+# - Script creates timestamped build directories.
+
 # Exit on any error, unbound variable, or error in a pipeline
 set -euo pipefail
 
-
+#! +--------------------------+
+#! |      GLOBAL VARIABLES    |
+#! +--------------------------+
 # Define variables to store states of both flags
 use_defaults=false
 no_flavor=false
-
 # Define available flags
 valid_flags="use-defaults,h,no-flavor"
 
 # Get the current date and time
 current_date_time=$(date "+%Y-%m-%d:%H:%M:%S")
 
-#+----------------------------------------------+
-#|      Function to build and copy files        |
-#+----------------------------------------------+
+#+---------------------------------+
+#|     Function Declarations       |
+#+---------------------------------+
+#! Function to run flutter commands, ALTER COMMANDS AS NEEDED (project specific)
+run_flutter_commands() {
+    echo "🚀 Cleaning, fetching dependencies, and running build processes..."
+    flutter clean
+    flutter pub get
+    dart pub get
+    dart run build_runner build --delete-conflicting-outputs
+}
+
 # Function to build and copy files
 build_and_copy_files() {
     if [ "$1" == "apk" ]; then
@@ -31,15 +72,6 @@ build_and_copy_files() {
     cp -r $4* builds/$current_date_time/[$2-$1]
 
     echo "✅ Build completed for $2 flavor and type $1"
-}
-
-#! Function to run flutter commands, change this if you want to run any other commands before building
-run_flutter_commands() {
-    echo "🚀 Cleaning, fetching dependencies, and running build processes..."
-    flutter clean
-    flutter pub get
-    dart pub get
-    dart run build_runner build --delete-conflicting-outputs
 }
 
 #+-------------------------+
@@ -144,9 +176,8 @@ fi
 #+-------------------------+
 # Check if the flag is set and take appropriate action
 if [[ $use_defaults == true ]]; then
-    #! DEFAULTS - Change these values to your own
-    num_flavors=2
-    flavors=("dev" "lib/main_dev.dart" "prod" "lib/main_prod.dart")
+    num_flavors=$default_num_flavors
+    flavors=("${default_flavors[@]}")
 else
     # if no-flavor, then skip this step
     if [[ $no_flavor == false ]]; then
