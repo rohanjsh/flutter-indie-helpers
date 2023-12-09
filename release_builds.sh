@@ -1,26 +1,24 @@
 #!/bin/bash
 
-#! DEFAULTS
-#! change these to your own
+#!  DEFAULTS
+#!  Change these to your own
+#!  PASS --use-defaults FLAG, TO USE THESE DEFAULTS
 default_num_flavors=2
 default_flavors=("dev" "lib/main_dev.dart" "prod" "lib/main_prod.dart")
+default_build_types=("apk" "appbundle" "ipa")
 
+#  DESCRIPTION
 # Automates Flutter project builds with flavor and type options.
 
 # Prerequisites:
 # - Flutter installed and configured.
 # - Bash shell environment.
 
-# Usage:
-# - Default: ./build_script.sh
-# - Custom: ./build_script.sh --use-defaults
-# - No Flavor: ./build_script.sh --no-flavor
-
 # Options:
 # --use-defaults: Use default values.
 # --no-flavor: Build without flavors.
 
-# Examples:
+# Usage:
 # - Default: ./build_script.sh
 # - Custom: ./build_script.sh --use-defaults
 # - No Flavor: ./build_script.sh --no-flavor
@@ -29,6 +27,7 @@ default_flavors=("dev" "lib/main_dev.dart" "prod" "lib/main_prod.dart")
 # - Run the script and follow prompts for custom builds.
 #   - Number of flavors
 #   - Flavor name and entry point for each flavor
+#   - Build types to generate
 # - Script creates timestamped build directories.
 
 # Exit on any error, unbound variable, or error in a pipeline
@@ -56,6 +55,42 @@ run_flutter_commands() {
     flutter pub get
     dart pub get
     dart run build_runner build --delete-conflicting-outputs
+}
+
+# Function to display an interactive menu for build types
+select_build_types() {
+    if [[ $use_defaults == true ]]; then
+        build_types=("${default_build_types[@]}")
+        return
+    fi
+
+    echo "️  Select the build type(s) you want to generate:"
+    echo "  1. APK"
+    echo "  2. AAB (App Bundle)"
+    echo "  3. IPA"
+    echo "  0. All"
+
+    read -p "Enter your choice (comma-separated numbers): " build_type_choice
+
+    # Split the user input into an array of individual choices
+    IFS=',' read -r -a build_type_choices <<<"$build_type_choice"
+
+    build_types=()
+    # Loop through each choice and validate it
+    for choice in "${build_type_choices[@]}"; do
+        case "$choice" in
+        0) build_types=("apk" "appbundle" "ipa") ;;
+        1) build_types+=("apk") ;;
+        2) build_types+=("appbundle") ;;
+        3) build_types+=("ipa") ;;
+        *) echo "Invalid choice: '$choice'. Ignoring." ;;
+        esac
+    done
+
+    # Check if any valid choices were selected
+    if [[ ${#build_types[@]} -eq 0 ]]; then
+        echo "No valid build types selected. Exiting." && exit 1
+    fi
 }
 
 # Function to build and copy files
@@ -116,7 +151,7 @@ if [[ $no_flavor == true ]]; then
     run_flutter_commands
 
     # Directly run commands for each build type
-    for build_type in "apk" "appbundle" "ipa"; do
+    for build_type in "${build_types[@]}"; do
         case "$build_type" in
         "apk")
             flutter build apk --split-per-abi
@@ -146,12 +181,12 @@ if [[ $no_flavor == true ]]; then
             cp -r build/ios/ipa/* builds/$current_date_time/[no-flavor-$build_type]
             ;;
         esac
-    
+
         # Create a directory for the build
         mkdir -p builds/$current_date_time/[no-flavor-$build_type]
 
         # Copy files for each build type
-       case "$build_type" in
+        case "$build_type" in
         "apk")
             cp -r build/app/outputs/flutter-apk/* builds/$current_date_time/[no-flavor-$build_type]
             ;;
@@ -178,6 +213,7 @@ fi
 if [[ $use_defaults == true ]]; then
     num_flavors=$default_num_flavors
     flavors=("${default_flavors[@]}")
+    select_build_types
 else
     # if no-flavor, then skip this step
     if [[ $no_flavor == false ]]; then
@@ -191,9 +227,18 @@ else
             read -p "🍦 Flavor $i name:  " flavor_name
             read -p "📄 Entry point location of flavor $i (eg. lib/main_dev.dart): " main_dart_location
 
+            #check if the file exists
+            #if it does not exist, then ask again
+            while [[ ! -f $main_dart_location ]]; do
+                echo "🚫 File $main_dart_location does not exist, try again"
+                read -p "📄 Entry point location of flavor $i (eg. lib/main_dev.dart): " main_dart_location
+            done
+
             # Add flavor information to the array
             flavors+=("$flavor_name" "$main_dart_location")
         done
+
+        select_build_types
     fi
 fi
 
@@ -205,7 +250,7 @@ for ((i = 0; i < ${#flavors[@]}; i += 2)); do
     main_dart_location=${flavors[i + 1]}
 
     # Build and copy files for each build type
-    for build_type in "apk" "appbundle" "ipa"; do
+    for build_type in "${build_types[@]}"; do
         case "$build_type" in
         "apk")
             output_directory="build/app/outputs/flutter-apk/"
