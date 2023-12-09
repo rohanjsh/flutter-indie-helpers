@@ -43,7 +43,7 @@ no_flavor=false
 valid_flags="use-defaults,h,no-flavor"
 
 # Get the current date and time
-current_date_time=$(date "+%Y-%m-%d:%H:%M:%S")
+current_date_time=$(date "+%Y-%m-%d_%H-%M-%S")
 
 #+---------------------------------+
 #|     Function Declarations       |
