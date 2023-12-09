@@ -54,7 +54,8 @@ run_flutter_commands() {
     flutter clean
     flutter pub get
     dart pub get
-    dart run build_runner build --delete-conflicting-outputs
+    #! Uncomment the following line if you are using build_runner
+    # dart run build_runner build --delete-conflicting-outputs
 }
 
 # Function to display an interactive menu for build types
@@ -148,6 +149,7 @@ done
 
 # Check if the no-flavor flag is set
 if [[ $no_flavor == true ]]; then
+    select_build_types
     run_flutter_commands
 
     # Directly run commands for each build type
