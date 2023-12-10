@@ -3,14 +3,14 @@
 ### Collection of quick scripts, utilities mainly dedicated to indie developers
 
 #### Table of contents
-- [Release Builds](#flutter-builds-script)
+- [Release Builds](#flutter-builds-script-)
 - [Unused Assets Remover](#remove-unused-assets-script-)
 
 ## Flutter Builds Script 🧑‍💻
 
 Making it easier to generate all flutter builds.
 
-### Description
+### Description 
 
 This script automates Flutter project builds with flavor and type options. It allows you to customize the number of flavors, flavor names, entry points, and build types.
 
@@ -73,7 +73,7 @@ This script helps you clean up your Flutter project by removing assets that are 
 
 - The script checks for references to each asset in the `lib` folder and its subdirectories.
 
-### Example
+### Example 
 
 ```bash
 # Enter the location of the assets folder
