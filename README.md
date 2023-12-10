@@ -1,12 +1,12 @@
-![Logo](https://storage.googleapis.com/cms-storage-bucket/847ae81f5430402216fd.svg)
+<img src="https://storage.googleapis.com/cms-storage-bucket/847ae81f5430402216fd.svg" width="200">
 
-# Indie Developer Helpers
-#### Helping Each Other 
+### Collection of quick scripts, utilities mainly dedicated to indie developers
 
+#### Table of contents
 - [Release Builds](#flutter-builds-script)
-- [Unused Assets Remover](#remove-unused-assets-script-🧹)
+- [Unused Assets Remover](#remove-unused-assets-script-)
 
-## Flutter Builds Script
+## Flutter Builds Script 🧑‍💻
 
 Making it easier to generate all flutter builds.
 
