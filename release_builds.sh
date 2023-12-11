@@ -69,7 +69,6 @@ select_build_types() {
     echo "  1. APK"
     echo "  2. AAB (App Bundle)"
     echo "  3. IPA"
-    echo "  0. All"
 
     read -p "Enter your choice (comma-separated numbers): " build_type_choice
 
@@ -80,7 +79,6 @@ select_build_types() {
     # Loop through each choice and validate it
     for choice in "${build_type_choices[@]}"; do
         case "$choice" in
-        0) build_types=("apk" "appbundle" "ipa") ;;
         1) build_types+=("apk") ;;
         2) build_types+=("appbundle") ;;
         3) build_types+=("ipa") ;;
@@ -110,45 +108,8 @@ build_and_copy_files() {
     echo "✅ Build completed for $2 flavor and type $1"
 }
 
-#+-------------------------+
-#|      Process flags      |
-#+-------------------------+
-# Process options using getopts
-while getopts ":h-:" opt; do
-    case $opt in
-    -)
-        case $OPTARG in
-        use-defaults)
-            use_defaults=true
-            ;;
-        h)
-            echo "Usage: $0 [--$valid_flags]"
-            exit 0
-            ;;
-        no-flavor)
-            no_flavor=true
-            ;;
-        *)
-            echo "Invalid option: --$OPTARG" >&2
-            echo "Available options: $valid_flags" >&2
-            exit 1
-            ;;
-        esac
-        ;;
-    h)
-        echo "Usage: $0 [--$valid_flags]"
-        exit 0
-        ;;
-    \?)
-        echo "Invalid option: -$OPTARG" >&2
-        echo "Available options: $valid_flags" >&2
-        exit 1
-        ;;
-    esac
-done
-
-# Check if the no-flavor flag is set
-if [[ $no_flavor == true ]]; then
+#function to call if no flavor is selected
+no_flavor_build(){
     select_build_types
     run_flutter_commands
 
@@ -206,6 +167,48 @@ if [[ $no_flavor == true ]]; then
 
     open builds/$current_date_time
     exit 0
+}
+
+#+-------------------------+
+#|      Process flags      |
+#+-------------------------+
+# Process options using getopts
+while getopts ":h-:" opt; do
+    case $opt in
+    -)
+        case $OPTARG in
+        use-defaults)
+            use_defaults=true
+            ;;
+        h)
+            echo "Usage: $0 [--$valid_flags]"
+            exit 0
+            ;;
+        no-flavor)
+            no_flavor=true
+            ;;
+        *)
+            echo "Invalid option: --$OPTARG" >&2
+            echo "Available options: $valid_flags" >&2
+            exit 1
+            ;;
+        esac
+        ;;
+    h)
+        echo "Usage: $0 [--$valid_flags]"
+        exit 0
+        ;;
+    \?)
+        echo "Invalid option: -$OPTARG" >&2
+        echo "Available options: $valid_flags" >&2
+        exit 1
+        ;;
+    esac
+done
+
+# Check if the no-flavor flag is set
+if [[ $no_flavor == true ]]; then
+    no_flavor_build
 fi
 
 #+-------------------------+
@@ -221,6 +224,10 @@ else
     if [[ $no_flavor == false ]]; then
         read -p "🤔 Number of flavors?  " num_flavors
 
+        #if flavor is 0, then call 
+        if [[ $num_flavors -eq 0 ]]; then
+            no_flavor_build
+        fi
         # Array to store flavor information
         declare -a flavors
 
