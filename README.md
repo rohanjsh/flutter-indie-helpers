@@ -19,6 +19,9 @@ This script automates Flutter project builds with flavor and type options. It al
 - [Flutter](https://flutter.dev/docs/get-started/install) installed and configured.
 - Bash shell environment.
 
+### Available on FIG
+`fig run flutter-release-builds`
+
 ### **Demo for - release_builds.sh**
 
 https://github.com/rohanjsh/flutter-indie-helpers/assets/35066779/f79b92d1-659c-48f6-b647-a01d91bea347
@@ -64,6 +67,9 @@ This script helps you clean up your Flutter project by removing assets that are 
 3. The script will search for unused assets in the specified folder and its subdirectories.
 
 4. Unused assets will be deleted.
+
+### Available on FIG
+`fig run flutter-remove-unused-assets`
 
 ### Note
 
